@@ -1,0 +1,6 @@
+[submodule "engine/translations"]
+    path = engine/translations
+    url = https://gerrit.collaboraoffice.com/translations
+[submodule "engine/dictionaries"]
+    path = engine/dictionaries
+    url = https://gerrit.collaboraoffice.com/dictionaries
