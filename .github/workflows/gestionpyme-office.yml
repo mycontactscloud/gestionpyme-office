@@ -1,0 +1,47 @@
+name: Build GestionPYME Office
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Prepare isolated build runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          sudo sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
+          sudo apt-get update
+          sudo env DEBIAN_FRONTEND=noninteractive apt-get build-dep -y libreoffice
+          sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y autoconf automake libtool pkg-config \
+            build-essential libssl-dev libcap-dev libpam0g-dev libpng-dev zlib1g-dev \
+            libzstd-dev libxml2-utils python3-polib python3-lxml nodejs npm gettext \
+            librsvg2-bin poppler-utils zstd nasm libcppunit-dev
+          df -h .
+      - name: Compile engine, browser and server from source
+        run: bash mcc-distribution/build.sh
+      - name: Test server and real document rendering
+        run: python3 mcc-distribution/smoke-test.py
+      - name: Export verified image
+        run: |
+          RELEASE=$(python3 -c 'import json; print(json.load(open("mcc-distribution/distribution.json"))["release"])')
+          docker tag gestionpyme-office:build "mycontactscloud/gestionpyme-office:$RELEASE"
+          docker save "mycontactscloud/gestionpyme-office:$RELEASE" | zstd -T0 -6 -o "gestionpyme-office-$RELEASE.tar.zst"
+          python3 mcc-distribution/package-source.py
+          sha256sum "gestionpyme-office-$RELEASE.tar.zst" "gestionpyme-office-$RELEASE-source.tar.zst" > SHA256SUMS
+          python3 -c 'import json,os,subprocess; from pathlib import Path; d=json.load(open("mcc-distribution/distribution.json")); d["sourceCommit"]=os.environ["GITHUB_SHA"]; d["imageId"]=json.loads(subprocess.check_output(["docker","image","inspect","gestionpyme-office:build"]))[0]["Id"]; Path("build-manifest.json").write_text(json.dumps(d,ensure_ascii=False,indent=2))'
+      - name: Publish source-linked release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RELEASE=$(python3 -c 'import json; print(json.load(open("mcc-distribution/distribution.json"))["release"])')
+          gh release create "$RELEASE" --verify-tag --title "GestionPYME Office $RELEASE" \
+            --notes-file mcc-distribution/RELEASE.md \
+            "gestionpyme-office-$RELEASE.tar.zst" "gestionpyme-office-$RELEASE-source.tar.zst" SHA256SUMS build-manifest.json
