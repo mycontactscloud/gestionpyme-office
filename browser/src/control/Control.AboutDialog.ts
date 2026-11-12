@@ -12,6 +12,7 @@
  */
 
 /*
+ * Modified by Software GestiónPYME, 2026-11-12: source and license link in browser.
  * AboutDialog - implements Help - About dialog with version and warnings
  */
 
@@ -198,6 +199,16 @@ class AboutDialog {
 				window.postMobileMessage('LICENSE'),
 			);
 			elements.licenseInfo.appendChild(licenseLink);
+		}
+
+		// Independent distribution: preserve attribution and provide corresponding source.
+		if (!window.ThisIsAMobileApp) {
+			this.appendSpanAndLink(
+				elements.licenseInfo,
+				'Based on Collabora Online. ',
+				'https://github.com/mycontactscloud/gestionpyme-office/tree/gp-26.04.6.1-3',
+				'Source code and licenses',
+			);
 		}
 
 		// Copyright and vendor
@@ -483,9 +494,7 @@ class AboutDialog {
 		const licenseInfo = AboutDialog.createElement('div', {
 			id: 'license-information',
 		});
-		if (window.ThisIsAMobileApp) {
-			infoDiv.appendChild(licenseInfo);
-		}
+		infoDiv.appendChild(licenseInfo);
 
 		// Copyright
 		const copyright = AboutDialog.createElement('p', {
