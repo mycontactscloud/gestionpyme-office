@@ -1,173 +1,84 @@
-# Collabora Online and Collabora Office
+# GestiónPYME Office
 
-> [!IMPORTANT]
-> **The CollaboraOnline/online.mirror repository on GitHub is a read-only mirror.**
-> Collabora Online and Collabora Office are developed on our Gerrit
-> instance at **https://gerrit.collaboraoffice.com**; the GitHub repository only mirrors that
-> source code.
->
-> - **Code contributions** go through Gerrit, not GitHub. Pull requests are disabled here; see
->   [CONTRIBUTING.md](CONTRIBUTING.md#contributing-to-source-code) for how to submit a patch.
-> - **Report issues** at the [CollaboraOnline/online issue tracker](https://github.com/CollaboraOnline/online/issues/new/choose).
+Independent WOPI document editor maintained by Software GestiónPYME, based on
+Collabora Online **26.04.6.1**. This is a source distribution and build project;
+it does not contain the My Contacts Cloud application or its data.
 
-[![Development: Gerrit](https://img.shields.io/badge/Development-Gerrit-orange?logo=git "Code development and review happen on Gerrit. GitHub pull requests are disabled.")](https://gerrit.collaboraoffice.com)
-[![Collabora Office Development Preview](https://img.shields.io/badge/Collabora%20Office-Development%20Preview-blue "Test the latest development snaphots of Collabora Office.")](https://www.collaboraoffice.com/downloads/CODA-Hd7wwbJWxm/)
+The complete upstream source, including the rendering engine under `engine/`,
+is retained in this repository. The base is upstream tag `cp-26.04.6-1`, commit
+`febe91b27107ff458ddb8dcdf8c0c6d521483033`.
 
+## Distribution changes
 
-[![Matrix](https://img.shields.io/badge/Matrix-%23cool--dev-turquoise.svg)](https://matrix.to/#/#cool-dev:matrix.org)
-[![Telegram](https://img.shields.io/badge/Telegram-Collabora%20Online-green.svg)](https://t.me/CollaboraOnline)
-[![Forum](https://img.shields.io/badge/Forum-Discourse-blue.svg)](https://forum.collaboraonline.com/)
-[![Website](https://img.shields.io/badge/Website-www.collaboraoffice.org-blueviolet.svg)](https://www.collaboraoffice.org/)
-[![L10n](https://img.shields.io/badge/L10n-Weblate-lightgrey.svg)](https://hosted.weblate.org/projects/collabora-online/)
+- Compile the engine, server and browser from source; do not install `code-brand`
+  or download Collabora's proprietary branding repository.
+- Use our own product name, vendor, logo and browser theme.
+- Add the corresponding-source link to the browser's About dialog while
+  retaining the upstream copyright and license notices.
+- Build and test a Docker image using the manual GitHub Actions workflow.
+- Publish a tagged source tree, image archive, checksum and build manifest after
+  capabilities, discovery and document-rendering checks pass.
 
+See [build configuration](mcc-distribution/distribution.json),
+[build script](mcc-distribution/build.sh),
+[runtime Dockerfile](mcc-distribution/Dockerfile) and
+[workflow](.github/workflows/gestionpyme-office.yml).
 
-**Secure Document Collaboration. Controlled by You.**
+Use `git clone --recurse-submodules` to obtain the pinned translations and
+dictionaries too. The release's custom `-source.tar.zst` asset includes these
+modules and the source tarballs fetched during the build; GitHub's automatic
+source archives omit submodule contents. Large source archives are published as
+numbered `.part001`, `.part002` assets. Download all parts and `SHA256SUMS`, run
+`sha256sum -c SHA256SUMS`, then concatenate the parts in order before extracting:
 
-![](https://www.collaboraonline.com/wp-content/uploads/2024/02/Website_COOL_2305_Home-1024x366.png)
+```sh
+cat gestionpyme-office-*-source.tar.zst.part* > source.tar.zst
+tar --zstd -xf source.tar.zst
+```
 
-## Learn more 💡
-* [Collabora Online Development Edition (CODE)](https://www.collaboraonline.com/code/)
-* [Collabora Online](https://www.collaboraonline.com/collabora-online/)
-* [Collabora Office](https://www.collaboraonline.com/collabora-office/)
-* [Collabora Office for iOS and Android](https://www.collaboraonline.com/collabora-office-android-ios/)
-* For additional details, build instructions, downloads, and more, please visit [www.collaboraoffice.org](https://www.collaboraoffice.org/). You can also explore the [SDK Documentation](https://sdk.collaboraonline.com/).
+## License and attribution
 
-## Key features
-* View and edit text documents, spreadsheets, presentations & more
-* Collaborative editing features
-* Collabora Online works in any modern browser – no plugin needed
-* [Integrate, extend and customise](https://www.collaboraonline.com/integrations/)
-* Open Source – primarily under the [MPLv2](http://mozilla.org/MPL/2.0/) license. Some parts are under other open source licences, see e.g. [browser/LICENSE](https://github.com/CollaboraOnline/online/blob/main/browser/LICENSE); the branding in [browser/branding](https://github.com/CollaboraOnline/online/tree/main/browser/branding) is under the [Apache License 2.0](https://github.com/CollaboraOnline/online/blob/main/browser/branding/LICENSE).
+Copyright the Collabora Online contributors and other upstream authors.
+Distribution additions and modifications by Software GestiónPYME, 2026, are
+available under **MPL-2.0**. Existing files and dependencies retain their licenses,
+including the notices in [COPYING](COPYING), [THIRDPARTYLICENSES](THIRDPARTYLICENSES),
+[browser/LICENSE](browser/LICENSE) and the engine's license files.
 
-## Get in touch 💬
+The `code-brand` binary package and its proprietary themes are not used in this
+build. Original open-source notices are preserved. The GestiónPYME name and
+marks identify this independent distribution; source availability does not grant
+trademark rights. Collabora's trademarks remain their owners' property.
+This distribution is not endorsed or supported by Collabora.
 
-* [📋 Forum](https://forum.collaboraonline.com/)
-* [👥 Facebook](https://www.facebook.com/collaboraoffice/)
-* [🅾 Instagram](https://www.instagram.com/collaboraoffice/)
-* [🐣 𝕏(Twitter)](https://twitter.com/CollaboraOffice)
-* [🦋 Bluesky](https://bsky.app/profile/collaboraonline.com)
-* [🐘 Mastodon](https://mastodon.social/@CollaboraOffice)
-* [💼 LinkedIn](https://www.linkedin.com/products/collaboraproductivity-collabora-online/)
-* [🎥 YouTube](https://www.youtube.com/@CollaboraOnline)
+## Packaging-only revisions
 
-## Integrating
+Revision gp-26.04.6.1-5 repairs two license-resource filenames over our previously
+source-compiled gp-26.04.6.1-4 image. It retains the compiled code from
+9dafcdea7332fc0999fee071a36031ac5c0d20e2 and publishes the packaging changes and
+complete source again. The manifest records the compiled source, packaging
+source and base image separately. The compiled About dialog retains its exact
+compiled-source link; the branding and license page link to the packaging source.
 
-To [integrate](https://sdk.collaboraonline.com/docs/why_integrate.html) Collabora Online into your own solution, you can see our [step-by-step tutorial](https://sdk.collaboraonline.com/docs/Step_by_step_tutorial.html), view the [available integrations](https://sdk.collaboraonline.com/docs/available_integrations.html), understand the [post message API](https://sdk.collaboraonline.com/docs/postmessage_api.html) used to customize and interact with Collabora Online, and a lot more.
+The separate packaging workflow rejects any change to compiled source files or
+the upstream source pin. Use the full build workflow for engine, browser or
+server code changes. Both workflows verify all public license resources before
+publishing an immutable image and source release.
 
+Original project documentation: [upstream README](mcc-distribution/UPSTREAM-README.md).
 
-### Test running with integration for developers
+Revision gp-26.04.6.1-6 additionally bundles the readable, MPL-2.0
+`mcc-distribution/standalone-window.js` extension through the branding generator.
+It listens to the editor's internal UI_Close event in standalone browser windows
+and closes them after normal document teardown. It does not close embedded
+frames or native editor shells. Its focused regression checks run in the
+packaging workflow; the compiled engine/browser/server remain unchanged.
 
-Set up Nextcloud or ownCloud on localhost and install the richdocuments app, or explore other integrations that can be used to test Collabora Online at https://www.collaboraonline.com/integrations/.
-
-Good tutorials exist how to install ownCloud or Nextcloud, we don't repeat
-them here. richdocuments is called Collabora Online in the respective app
-stores / marketplaces / whatever.
-
-When you have a running Nextcloud or ownCloud instance at
-http://localhost/nextcloud or at http://localhost/owncloud
-go to Collabora Online settings, and set the WOPI URL to
-http://localhost:9980
-
-Then in the build tree, edit the generated coolwsd.xml and set ssl setting to
-false. You can run make run, and test coolwsd with the ownCloud or Nextcloud
-integration.
-
-Note: if SSL is enabled in either Online or the integration, both must
-have SSL enabled. That is, you must access NC/OC using https:// as well
-as configure the Collabora Online endpoint in NC/OC as https://localhost:9980.
-
-## Find a partner
-
-Do you want a ready-to-go or simplified solution? Find a trusted vendor from our [list of global partners](https://www.collaboraonline.com/partners/) who integrate and host Collabora Online.
-
-## Developer assistance
-Please ask your questions on any of the bridged Matrix/Telegram rooms
-* Matrix: [#cool-dev:matrix.org](https://matrix.to/#/#cool-dev:matrix.org)
-* Telegram: [CollaboraOnline](https://t.me/CollaboraOnline)
-
-Join the conversation on our Discourse server at https://forum.collaboraonline.com/
-
-Watch the tinderbox status (it should be green):
-
-[![tinderbox status](https://cpci.cbg.collabora.co.uk:8080/buildStatus/icon?job=Tinderbox+for+online+main&subject=tinderbox)](https://cpci.cbg.collabora.co.uk:8080/view/Tinderbox/job/Tinderbox%20for%20online%20main/)
-
-## Development bits
-
-This project has several components:
-* **engine/**
-  * The document rendering engine
-* **wsd/**
-  * The Web Services Daemon - which accepts external connections
-* **kit/**
-  * The client which lives in its own chroot and renders documents
-* **common/**
-  * Shared code between these processes
-* **browser/**
-  * The client side JavaScript component
-* **test/**
-  * C++ based unit tests
-* **cypress_test/**
-  * JavaScript based integration tests
-
-## Building for development
-
-The engine (core) is built first, then online on top of it.
-
-    cd engine
-    ./autogen.sh --with-distro=CPLinux-LOKit-Dev
-    make
-    cd ..
-    ./autogen.sh --enable-developer
-    make
-
-Then "make run" to start coolwsd. Both developer options are convenience
-bundles; pass individual configure options to override a piece. To bootstrap
-from scratch, see scripts/clone-online.sh.
-
-See also README-gbuild.md for an ongoing merge of the two-step engine and online builds.
-
-## Software Bill of Materials
-
-Collabora Online generates SBOMs for the server, the browser client, the
-engine and the container images. [SBOM.md](SBOM.md) describes how they are
-generated, how to check them (`make sbom-check`, `make sbom-audit`,
-`make sbom-freshness`), how to scan them for known vulnerabilities, and what
-a clean scan does *not* tell you.
-
-## Further recommended reading with build details
-
-* **[Build Collabora Online](https://www.collaboraoffice.org/post/build-code/)**
-* **[Build Collabora Office for iOS](https://www.collaboraoffice.org/post/build-code-ios/)**
-* **[Build Collabora Office for Android](https://www.collaboraoffice.org/post/build-code-android/)**
-* **[Build Collabora Office for Windows](https://www.collaboraoffice.org/post/build-co-windows/)**
-* **[Build Collabora Office for macOS](https://www.collaboraoffice.org/post/build-co-mac/)**
-* **[Build Collabora Office for Linux](https://www.collaboraoffice.org/post/build-co-linux/)**
-
-## Admin Panel
-
-You can access the admin panel by directly accessing the admin.html file
-from browser directory.
-
-Websocket connections to admin console can be made at path: /adminws/ on the
-same url and port as coolwsd is running on. However, one needs a JWT token to
-authenticate to the admin console websocket. This is stored as a cookie with
-`Path: /adminws/` when user successfully authenticates when trying to access
-/browser/dist/admin/admin\*html files (HTTP Basic authentication). Token
-is expired after every half an hour, so websocket connection to admin console
-must be established within this period.
-
-It should also be possible to do various sorts of tasks such as killing
-documents that are open for more than 10 hours etc. See protocol.txt for
-various commands. Only tricky thing here is getting the JWT token which can
-be obtained as described above.
-
-## Protocol description
-
-See **[protocol.txt](wsd/protocol.txt)** for a description of the protocol to be used over the
-websocket.
-
-## Architecture
-
-Please refer to https://sdk.collaboraonline.com/docs/architecture.html
-
-## Enjoy!
+Revision gp-26.04.6.1-8 supplies missing paragraph labels through the engine's
+existing gettext catalogs, without recompiling the engine or browser. The
+preferred additions are in mcc-distribution/paragraph-translations.json;
+patch-translations.py applies them contextually and preserves all original
+entries and plural forms. The packaged catalogs and every locale are checked
+independently with Python's gettext reader. No DOM text replacement is used.
+Existing German and French translations and their catalog bytes are preserved.
+The preliminary revision 7 stopped before image publication when its guard
+detected those existing translations; its source tag remains immutable.

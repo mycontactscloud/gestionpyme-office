@@ -1,0 +1,50 @@
+name: Repair GestionPYME Office packaging
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  packaging:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Verify standalone window close behavior
+        run: node mcc-distribution/test-standalone-window.cjs
+      - name: Verify contextual translations preserve original catalogs
+        run: python3 -B mcc-distribution/test-translations.py
+      - name: Prepare source-linked packaging repair
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zstd poppler-utils
+          python3 mcc-distribution/prepare-packaging.py
+      - name: Verify server, rendering and all license resources
+        run: python3 mcc-distribution/smoke-test.py
+      - name: Export verified image and complete source
+        run: |
+          set -euo pipefail
+          RELEASE=$(python3 -c 'import json; print(json.load(open("mcc-distribution/distribution.json"))["release"])')
+          docker tag gestionpyme-office:build "mycontactscloud/gestionpyme-office:$RELEASE"
+          docker save "mycontactscloud/gestionpyme-office:$RELEASE" | zstd -T0 -6 -o "gestionpyme-office-$RELEASE.tar.zst"
+          python3 mcc-distribution/package-source.py
+          sha256sum "gestionpyme-office-$RELEASE.tar.zst" gestionpyme-office-"$RELEASE"-source.tar.zst* > SHA256SUMS
+          python3 - <<'PY'
+          import json,os,subprocess
+          from pathlib import Path
+          d=json.load(open('mcc-distribution/distribution.json'))
+          b=json.load(open('mcc-distribution/packaging-base.json'))
+          d.update(sourceCommit=os.environ['GITHUB_SHA'],compiledSourceCommit=b['sourceCommit'],baseSourceRelease=b['release'],baseImageId=b['imageId'],buildKind='resource-packaging',translationCatalogs=json.load(open('translation-manifest.json')))
+          d['imageId']=json.loads(subprocess.check_output(['docker','image','inspect','gestionpyme-office:build']))[0]['Id']
+          Path('build-manifest.json').write_text(json.dumps(d,ensure_ascii=False,indent=2))
+          PY
+      - name: Publish immutable packaging revision
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RELEASE=$(python3 -c 'import json; print(json.load(open("mcc-distribution/distribution.json"))["release"])')
+          gh release create "$RELEASE" --verify-tag --title "GestionPYME Office $RELEASE" --notes-file mcc-distribution/RELEASE.md \
+            "gestionpyme-office-$RELEASE.tar.zst" gestionpyme-office-"$RELEASE"-source.tar.zst* SHA256SUMS build-manifest.json translation-manifest.json

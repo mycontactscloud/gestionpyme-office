@@ -1,0 +1,22 @@
+{
+  "product": "GestiónPYME Office",
+  "slug": "gestionpyme-office",
+  "vendor": "Software GestiónPYME",
+  "version": "26.04.6.1",
+  "release": "gp-26.04.6.1-9",
+  "upstreamTag": "cp-26.04.6-1",
+  "upstreamCommit": "febe91b27107ff458ddb8dcdf8c0c6d521483033",
+  "repository": "https://github.com/mycontactscloud/gestionpyme-office",
+  "modules": [
+    {
+      "path": "engine/translations",
+      "url": "https://gerrit.collaboraoffice.com/translations",
+      "commit": "31724bb28b5b2520295b1734ea2ffa0ca58225e0"
+    },
+    {
+      "path": "engine/dictionaries",
+      "url": "https://gerrit.collaboraoffice.com/dictionaries",
+      "commit": "d8b00519a496f80061ceaa520a8c791bddae8a93"
+    }
+  ]
+}
