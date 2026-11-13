@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MPL-2.0
+# Metadata-only repair over our previously source-compiled, verified image.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+USER 0
+COPY license-overlay/ /usr/share/coolwsd/browser/dist/licenses/
+COPY licenses.html /usr/share/coolwsd/browser/dist/licenses.html
+COPY branding/browser/branding.js /usr/share/coolwsd/browser/dist/branding.js
+COPY branding/browser/branding.css /usr/share/coolwsd/browser/dist/branding.css
+COPY translation-overlay/ /opt/collaboraoffice/program/resource/
+COPY browser-translation-overlay/ /usr/share/coolwsd/browser/dist/l10n/
+USER 1001

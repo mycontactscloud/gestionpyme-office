@@ -1,0 +1,6 @@
+{
+  "release": "gp-26.04.6.1-4",
+  "sourceCommit": "9dafcdea7332fc0999fee071a36031ac5c0d20e2",
+  "imageId": "sha256:6828f1326554a49a6b1270136f3d980bb846843f98db69117bfe540d3ee53427",
+  "upstreamCommit": "febe91b27107ff458ddb8dcdf8c0c6d521483033"
+}
