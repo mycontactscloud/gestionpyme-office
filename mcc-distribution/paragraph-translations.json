@@ -1,0 +1,23 @@
+{
+  "license": "MPL-2.0",
+  "domain": "svx",
+  "contextPrefix": "sidebarparagraph|",
+  "messages": [
+    {"id": "aboveparaspacinglabel", "source": "Above:"},
+    {"id": "beforetextindentlabel", "source": "Before:"},
+    {"id": "belowparaspacinglabel", "source": "Below:"},
+    {"id": "aftertextindentlabel", "source": "After:"},
+    {"id": "linespacinglabel", "source": "Line Spacing:"},
+    {"id": "firstlineindentlabel", "source": "First:"}
+  ],
+  "languages": {
+    "es": ["Encima:", "Antes:", "Debajo:", "Después:", "Interlineado:", "Primera línea:"],
+    "ca": ["A sobre:", "Abans:", "A sota:", "Després:", "Interlineat:", "Primera línia:"],
+    "gl": ["Arriba:", "Antes:", "Abaixo:", "Despois:", "Entreliñado:", "Primeira liña:"],
+    "de": ["Oberhalb:", "Vor:", "Unterhalb:", "Nach:", "Zeilenabstand:", "Erste Zeile:"],
+    "fr": ["Au-dessus :", "Avant :", "Au-dessous :", "Après :", "Interligne :", "Première ligne :"],
+    "it": ["Sopra:", "Prima:", "Sotto:", "Dopo:", "Interlinea:", "Prima riga:"],
+    "pt": ["Acima:", "Antes:", "Abaixo:", "Depois:", "Entrelinhas:", "Primeira linha:"],
+    "pt_BR": ["Acima:", "Antes:", "Abaixo:", "Depois:", "Entrelinhas:", "Primeira linha:"]
+  }
+}
